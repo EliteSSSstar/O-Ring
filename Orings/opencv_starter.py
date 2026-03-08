@@ -7,6 +7,10 @@ import time
 
 #read in an image into memory
 img = cv.imread('C:/Users/adam9/OneDrive/Documents/GitHub/O-Ring/Orings/cameraman.png',0)
+if img is None: # if path is wrong handle
+    print(" Error: image not found ")
+    exit()
+
 copy = img.copy()
 #check out some of its pixel values...img[x,y]..try different x and y values
 x = 100
@@ -34,7 +38,9 @@ print("Chosen threshold:", thresh)
 
 #implement thresholding ourselves using loops (soooo slow in python)
 before = time.time()
-thresh = 100
+
+#thresh = 100
+
 for x in range(0, img.shape[0]):
     for y in range(0, img.shape[1]):
         if img[x,y] > thresh:
@@ -62,6 +68,28 @@ for x in range(1, img.shape[0]-1):
         if np.sum(region) > 255*4:
             clean[x,y] = 255
 
+
+# Labeled Pixels
+labels = np.zeros(clean.shape)
+
+label = 1
+
+# Loop cleaned binary image
+for x in range(clean.shape[0]):
+    for y in range(clean.shape[1]):
+
+        if clean[x,y] == 255: # if pixal is belongs to white
+
+             # Assign label to the pixel
+            labels[x,y] = label
+            label += 1
+
+# Count all the labeled pixels 
+numRegions = np.max(labels)
+
+# display
+print("Total number of labeled pixels/regions:", numRegions) # 47749.0
+
 # Show Display
 cv.imshow('cleaned image', clean)
 cv.waitKey(0)
@@ -72,7 +100,7 @@ area = np.sum(clean == 255)
 print("Region area:", area)
 
 # pass Or Fail
-if area < 5000:
+if area < 6000:
     result = "FAIL"
 else:
     result = "PASS"
@@ -88,6 +116,7 @@ cv.putText(clean,
 
 cv.imshow('final result', clean)
 cv.waitKey(0)
+print("ORing result:", result)
 
 
 #now lets use the opencv built in function to threshold the image
